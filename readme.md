@@ -27,7 +27,7 @@ Luckliy we have many options as developers like strong Front-End Frameworks such
 
 **What are Web Sockets?**
 
-WebSockets are a TCP based Protocol application that establishes a bi-directional connection between the client and server, creating full duplex, persistent messages to be instantously distributed. Once a connection is established, it stays open as long as needed. 
+WebSockets are a TCP based Protocol application that establishes a bi-directional connection between the client and server, creating full duplex, persistent messages to be instantously distributed. Once a connection is established, it stays open as long as needed. Ajax requests are one way, always initiated by the client. When the server has sent the response, the connection will close. However with WebSockets this does not require the user to make a request in order for the client to recieve updates from the server. 
 
 
 
