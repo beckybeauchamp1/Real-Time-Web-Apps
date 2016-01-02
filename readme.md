@@ -27,7 +27,25 @@ Luckliy we have many options as developers like strong Front-End Frameworks such
 
 **What are Web Sockets?**
 
-WebSockets are a TCP based Protocol application that establishes a bi-directional connection between the client and server, creating full duplex, persistent messages to be instantously distributed. Once a connection is established, it stays open as long as needed. Ajax requests are one way, always initiated by the client. When the server has sent the response, the connection will close. However with WebSockets this does not require the user to make a request in order for the client to recieve updates from the server. 
+WebSockets are a TCP based Protocol application that establishes a bi-directional connection between the client and server, creating full duplex, persistent messages to be instantously distributed. Once a connection is established, it stays open as long as needed. Ajax requests are one way, always initiated by the client. When the server has sent the response, the connection will close. However with WebSockets this not the case and it does not even require the user to make a request in order for the client to recieve updates from the server. 
 
+In this tutorial, we are going to be using one API available, Socket.IO which allows us to easily establish a WebSocket in our application. We are going to be using Nodejs and Expressjs along side Socket.Io to create a simple chat messaging application. 
+
+First please make sure you have Node installed on your computer. If you do not, you will need to install it first before continuing https://nodejs.org/en/. 
+
+Let's create a new directory on our local computers and initialize npm. If your new to Node or npm, feel free to just hit enter for all of the metadata information, as we can edit it in the package.json file after. 
+
+```
+$ npm init
+```
+After we have initlized npm, let's make sure we install and save Express as a depedency. 
+```
+$ npm install express --save
+```
+Now that we have express installed, saved and added to our package.json file, we can begin by creating the files an folders we will need for this application. We will create need to create a main js file, which we will call index.js, which will define and establish all of our dependencies for our express application.
+```
+$ touch index.js
+```
+Inside Index.js we need to include the following:
 
 
