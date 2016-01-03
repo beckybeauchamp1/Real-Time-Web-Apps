@@ -66,15 +66,116 @@ http.listen(4000, function(){
 
 To run express from your command line, just type node index.js or use nodemon and you should see listing on port 4000 display on your terminal. Go to your browser and enter in localhost:4000 and you should see hello world displaying as well. 
 
-Great! Now that everything is configured, let’s instead create a static index.html file that will serve up a html document instead of passing in the string for the route. We can do this through the         following commands below. 
+Great! Now that everything is configured, let’s instead create a static index.html file that will serve up a html document instead of passing in the string for the route. We can do this through the following commands below. 
 
 For the purpose of this application, we are going to put all of our static file into a public directory which will contain all of our static files including our script.js file and stylesheet. 
 ```
 $ mkdir public
 $ cd public
-$touch index.html
-$mkdir js
-$touch js/script.js
-$mkdir css
-$touch css/style.css
+$ touch index.html
+$ mkdir js
+$ touch js/script.js
+$ mkdir css
+$ touch css/style.css
+```
+In order to render the index.html we need to call Express Middleware to look into the public directory:
+
+```js
+app.use(express.static(__dirname + '/public'));
+
+```
+
+
+In our main index.html file we need to add the following and make sure to link our stylesheet and script files:
+
+```html
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chat Message App</title>
+    <script src="js/script.js"></script>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+  </head>
+  <body>
+    <ul class="messages"></ul>
+    <form action="">
+      <input id="msg" autocomplete="off" /><button>Send</button>
+    </form>
+  </body>
+</html>
+```
+And in our style.css file:
+
+```css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font: 13px Helvetica, Arial;
+}
+form {
+  background: #000;
+  padding: 3px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+form input {
+  border: 0;
+  padding: 10px;
+  width: 90%;
+  margin-right: .5%;
+}
+form button {
+  width: 9%;
+  background: rgb(130, 224, 255);
+  border: none;
+  padding: 10px;
+}
+.messages {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.messages li {
+  padding: 5px 10px;
+}
+.messages li:nth-child(odd) {
+  background: #eee;
+}
+```
+
+Now that we have the basic font end files set up, it's time to config Socket.io. First, we need to install and save Socket.io to our package.json file. 
+```
+$ npm install socket.io --save 
+```
+
+Socket.io is composed of two parts on both the server and client side. In our main application index.js, we need to require it:
+
+```js
+var io = require("socket.io")(http);
+
+io.on("connection", function(socket){
+  console.log("Socket.io has been connected!");
+});
+
+```
+
+And in our index.html file we need to add both jQuery and Socket.io script tags:
+
+```html
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="js/script.js"></script>
+```
+Finally, in our script.js, we need to declare a socket variable:
+```js
+
+$(document).ready(function(){
+  var socket = io(); 
+});
 ```
