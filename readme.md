@@ -43,7 +43,7 @@ Below, we are going to be using one API available, Socket.io which allows us to 
 
 First please make sure you have Node installed on your computer. If you do not, you will need to install it first before continuing https://nodejs.org/en/. 
 
-**Chat Messaging Chat Example**
+**Chat Messaging App Example**
 
 Let's create a new directory on our local computers and initialize npm. If your new to Node or npm, feel free to just hit enter for all of the metadata questions, as we can edit it later on in the package.json file. 
 
@@ -238,8 +238,5 @@ Also, we are sending "message" consistently on the client and server, but please
 
 AND, that's it, you sould have a basic messaging chat set up. Socket.io's documentation examples additional methods available to continue building on your chat application. https://github.com/socketio/socket.io
 
-**Summary**
-
-
-
+In Summary, we have a lot of resources available as developers to send data over the web, asynchronously. Front-End Frameworks like Angular help us to more easily make Ajax requests and communicate between client and server. However, as we continue to build more applications that rely on real-time data, it appears WebSockets could be a useful resource in helping us accomplish our domain. 
 
