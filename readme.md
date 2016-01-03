@@ -49,3 +49,18 @@ $ touch index.js
 Inside Index.js we need to include the following:
 
 
+```js
+var express = require("express");
+var app = express();
+var http = require('http').Server(app);
+
+app.get('/', function(req, res){
+  res.send('<h1>Hello world</h1>');
+});
+
+http.listen(4000, function(){
+  console.log('listening on port 4000');
+});
+
+```
+
