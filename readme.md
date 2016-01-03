@@ -236,7 +236,7 @@ io.emit();
 
 Also, we are sending "message" consistently on the client and server, but please note you could name this anything including "pizza" and as long as it's consistent, it will work the same. Socket.io allows you to do this and create custom events. 
 
-AND, that's it, you sould have a basic messaging chat set up. Socket.io's documentation examples additional methods available to continue building on your chat application. https://github.com/socketio/socket.io
+Finally, at localhost://4000, you sould be able to send messages that appear on your application's webpage. Socket.io's documentation examples additional methods available to continue building your chat messaging application. https://github.com/socketio/socket.io
 
 In Summary, we have a lot of resources available as developers to send data over the web, asynchronously. Front-End Frameworks like Angular help us to more easily make Ajax requests and communicate between client and server. However, as we continue to build more applications that rely on real-time data, it appears WebSockets could be a useful resource in helping us accomplish our domain. 
 
