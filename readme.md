@@ -46,7 +46,7 @@ Now that we have express installed, saved and added to our package.json file, we
 ```
 $ touch index.js
 ```
-Inside Index.js we need to include the following:
+Inside index.js we need to include the following:
 
 
 ```js
@@ -64,3 +64,17 @@ http.listen(4000, function(){
 
 ```
 
+To run express from your command line, just type node index.js or use nodemon and you should see listing on port 4000 display on your terminal. Go to your browser and enter in localhost:4000 and you should see hello world displaying as well. 
+
+Great! Now that everything is configured, let’s instead create a static index.html file that will serve up a html document instead of passing in the string for the route. We can do this through the         following commands below. 
+
+For the purpose of this application, we are going to put all of our static file into a public directory which will contain all of our static files including our script.js file and stylesheet. 
+```
+$ mkdir public
+$ cd public
+$touch index.html
+$mkdir js
+$touch js/script.js
+$mkdir css
+$touch css/style.css
+```
