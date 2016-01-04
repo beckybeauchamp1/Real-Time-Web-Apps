@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Web Sockets : Blog Post Describing Different Ways of Transporting Data over the Web, with a particular focus on WebSockets">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Web Sockets</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/beckybeauchamp1/WebSockets">View on GitHub</a>
+
+          <h1 id="project_title">Web Sockets</h1>
+          <h2 id="project_tagline">Blog Post Describing Different Ways of Transporting Data over the Web, with a particular focus on WebSockets</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/beckybeauchamp1/WebSockets/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/beckybeauchamp1/WebSockets/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><strong>Transporting Data Over the Web</strong></p>
+
+<p>I am currently a student taking General Assembly’s Programming Bootcamp in DC and recently created an application for one of our projects using a lot Ajax calls to our backend and a third Party API in order to create a real-time, single page application. I had very little exposure to Ajax or Single Page Applications prior to starting this project and wanted to give a broad overview for any other fellow beginners starting out as well!</p>
+
+<p>In this blog post I will be discussing a few different ways of pushing data over the web between the client and the server, and then implement a simple messaging chat application using Nodejs, Express, and Socket.io.</p>
+
+<p>Let's start by disscuing the foundation for all data communications over the web, the HTTP protocol.</p>
+
+<p><strong>Summary of HTTP</strong></p>
+
+<p>Throughout my time during GA's web immersive, we have especially focused on creating RESTful applications, focused on HTTP requests. </p>
+
+<p>To further explain, HTTP is a protocol for transmitting data over the web. For example, when a user wants to make a purchase off Amazon and types in and submits the URL <a href="http://www.amazon.com/">http://www.amazon.com/</a>, an HTTP request is sent to a web server. </p>
+
+<p>HTTP behaves as a request-response protocol in the client-server model. The client(the browser in the example above) submits an HTTP request message to the server. The server, may provide HTML files, content, or even perform additional functions on behalf of the client, then returns a response message back. The response will contain the requested information if available in it's message body along with a completion status information. </p>
+
+<p>However, HTTP is considered to be a "stateless protocol", but what does that mean exactly?</p>
+
+<p>A web (HTTP) server does not remember previous requests from a user, and treats each request independently. There is no recorded continuity, and the server does not retain session information. Because of this, applications must implement another layer on top of HTTP to establish state, which is typically accomplished using session cookies. Websites maintain record of users by cookies, which are passed back and fourth for every request. </p>
+
+<p>Moreover, in order to send data asynchrously through an HTTP request, developers created the XMLHttpRequest object or jquery's version called Ajax.</p>
+
+<p><strong>What is Ajax?</strong></p>
+
+<p>Ajax, stands for Asynchronous JavaScript and XML, and consists of small exchanges of data from the client to the the server, so that the entire web page does not have to be reloaded each time the user makes a change. As developers we want a way to make requests to the server from the client side without a full page refresh, utlimately to make our applications faster and improve user experience. </p>
+
+<p>But what if the core goal of our application is to provide continous real time updates? What if we are creating an application that displays real time sports and game updates?</p>
+
+<p>We could use Ajax and “polling” to accomplish this by sending periodic requests for updates to the server, and dynamically manipulating the DOM to reflect those changes. This would essentially create a connection and keep it open for a period of time in which the client can receive data from server. </p>
+
+<p>We have many options as developers with strong Front-End Frameworks such as Angular which help making Ajax requests a lot easier or additional APIs to assist in these requests. </p>
+
+<p>However, this seems like an efficient way to grab changes from our server. One answer to this problem is are WebSockets, made available through HTML5, which allow an open connection to persist between the client and server in which both can send data at any time. </p>
+
+<p><strong>What are Web Sockets?</strong></p>
+
+<p>WebSockets are a TCP based Protocol application that establishes a single, bi-directional connection between the client and server, allowing full duplex, persistent messages to be instantously distributed. Once a connection is established, it stays open as long as needed. Ajax is a one-way request that's always intiated by the client, and when the server has sent the response, the connection will close. However with WebSockets both the client and server can send requests and the connection is kept open. Because WebSockets are built on the TCP protocol, which is a stateful protocol, we can accomplish this connection. </p>
+
+<p>As you can imagine, this is pretty powerful when we need to create applications that require real-time data. </p>
+
+<p>Below, we are going to be using one API available, Socket.io which allows us to easily establish a WebSocket in our application. We are going to be using Nodejs and Expressjs along side Socket.io to build a simple chat messaging application. </p>
+
+<p>First please make sure you have Node installed on your computer. If you do not, you will need to install it first before continuing <a href="https://nodejs.org/en/">https://nodejs.org/en/</a>. </p>
+
+<p><strong>Chat Messaging App Example</strong></p>
+
+<p>Let's create a new directory on our local computers and initialize npm. If your new to Node or npm, feel free to just hit enter for all of the metadata questions, as we can edit it later on in the package.json file. </p>
+
+<pre><code>$ npm init
+</code></pre>
+
+<p>After we have initlized npm, let's make sure we install and save Express as a dependency. </p>
+
+<pre><code>$ npm install express --save
+</code></pre>
+
+<p>Now that we have express installed, saved, and added to our package.json file, we can begin by creating the files an folders we will need for this application. We will create need to create a main JavaScript file, which we will call index.js, which will define and establish all of our dependencies for our express application.</p>
+
+<pre><code>$ touch index.js
+</code></pre>
+
+<p>In our index.js we need to include the following:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> express <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">"</span>express<span class="pl-pds">"</span></span>);
+<span class="pl-k">var</span> app <span class="pl-k">=</span> <span class="pl-en">express</span>();
+<span class="pl-k">var</span> http <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>http<span class="pl-pds">'</span></span>).<span class="pl-en">Server</span>(app);
+
+<span class="pl-smi">app</span>.<span class="pl-en">get</span>(<span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">req</span>, <span class="pl-smi">res</span>){
+  <span class="pl-smi">res</span>.<span class="pl-c1">send</span>(<span class="pl-s"><span class="pl-pds">'</span>&lt;h1&gt;Hello world&lt;/h1&gt;<span class="pl-pds">'</span></span>);
+});
+
+<span class="pl-smi">http</span>.<span class="pl-en">listen</span>(<span class="pl-c1">4000</span>, <span class="pl-k">function</span>(){
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>listening on port 4000<span class="pl-pds">'</span></span>);
+});
+</pre></div>
+
+<p>To run express from your command line, just type node index.js or use nodemon and you should see listing on port 4000 display on your terminal. If you do not have nodemon install you can easily install it gobally on your computer. This will automatically restart the server each time you make changes:</p>
+
+<pre><code>$ npm install -g nodemon
+</code></pre>
+
+<p>Now, go to your browser and enter in localhost:4000 and you should see hello world displaying as well. </p>
+
+<p>Great! Now that the basics are configured, let’s instead create an index.html file for our html content instead of passing in the string for the route. We can do this through the following commands below. </p>
+
+<p>For the purpose of this application, we are going to create a public directory which will contain all of our static files including our index.html, script.js, and stylesheet. </p>
+
+<pre><code>$ mkdir public
+$ cd public
+$ touch index.html
+$ mkdir js
+$ touch js/script.js
+$ mkdir css
+$ touch css/style.css
+</code></pre>
+
+<p>In order to render the index.html we need to call Express Middleware to look into the public directory and change our route:</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">app</span>.<span class="pl-en">use</span>(<span class="pl-smi">express</span>.<span class="pl-en">static</span>(<span class="pl-c1">__dirname</span> <span class="pl-k">+</span> <span class="pl-s"><span class="pl-pds">'</span>/public<span class="pl-pds">'</span></span>));
+
+<span class="pl-smi">app</span>.<span class="pl-en">get</span>(<span class="pl-s"><span class="pl-pds">'</span>/<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">req</span>, <span class="pl-smi">res</span>){
+  <span class="pl-smi">res</span>.<span class="pl-en">render</span>(<span class="pl-s"><span class="pl-pds">"</span>index.html<span class="pl-pds">"</span></span>);
+});</pre></div>
+
+<p>In our main index.html file we need to add the following and make sure to link our stylesheet and script files:</p>
+
+<div class="highlight highlight-text-html-basic"><pre>
+&lt;!DOCTYPE html&gt;
+&lt;<span class="pl-ent">html</span>&gt;
+  &lt;<span class="pl-ent">head</span>&gt;
+    &lt;<span class="pl-ent">meta</span> <span class="pl-e">charset</span>=<span class="pl-s"><span class="pl-pds">"</span>utf-8<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">title</span>&gt;Chat Message App&lt;/<span class="pl-ent">title</span>&gt;
+<span class="pl-s1">    &lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>js/script.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</span>
+    &lt;<span class="pl-ent">link</span> <span class="pl-e">rel</span>=<span class="pl-s"><span class="pl-pds">"</span>stylesheet<span class="pl-pds">"</span></span> <span class="pl-e">href</span>=<span class="pl-s"><span class="pl-pds">"</span>css/style.css<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>text/css<span class="pl-pds">"</span></span>&gt;
+  &lt;/<span class="pl-ent">head</span>&gt;
+  &lt;<span class="pl-ent">body</span>&gt;
+    &lt;<span class="pl-ent">ul</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>messages<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">ul</span>&gt;
+    &lt;<span class="pl-ent">form</span> <span class="pl-e">action</span>=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>&gt;
+      &lt;<span class="pl-ent">input</span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>msg<span class="pl-pds">"</span></span> <span class="pl-e">autocomplete</span>=<span class="pl-s"><span class="pl-pds">"</span>off<span class="pl-pds">"</span></span> /&gt;&lt;<span class="pl-ent">button</span>&gt;Send&lt;/<span class="pl-ent">button</span>&gt;
+    &lt;/<span class="pl-ent">form</span>&gt;
+  &lt;/<span class="pl-ent">body</span>&gt;
+&lt;/<span class="pl-ent">html</span>&gt;</pre></div>
+
+<p>And in our style.css file:</p>
+
+<div class="highlight highlight-source-css"><pre><span class="pl-ent">*</span> {
+  <span class="pl-c1"><span class="pl-c1">margin</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">box-sizing</span></span>: border-box;
+}
+<span class="pl-ent">body</span> {
+  <span class="pl-c1"><span class="pl-c1">font</span></span>: <span class="pl-c1">16<span class="pl-k">px</span></span> <span class="pl-c1">Helvetica</span>, <span class="pl-c1">Arial</span>;
+}
+<span class="pl-ent">form</span> {
+  <span class="pl-c1"><span class="pl-c1">background</span></span>: <span class="pl-c1">#000</span>;
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">3<span class="pl-k">px</span></span>;
+  <span class="pl-c1"><span class="pl-c1">position</span></span>: <span class="pl-c1">fixed</span>;
+  <span class="pl-c1"><span class="pl-c1">bottom</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">width</span></span>: <span class="pl-c1">100<span class="pl-k">%</span></span>;
+}
+<span class="pl-ent">form</span> <span class="pl-ent">input</span> {
+  <span class="pl-c1"><span class="pl-c1">border</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">10<span class="pl-k">px</span></span>;
+  <span class="pl-c1"><span class="pl-c1">width</span></span>: <span class="pl-c1">90<span class="pl-k">%</span></span>;
+  <span class="pl-c1"><span class="pl-c1">margin-right</span></span>: <span class="pl-c1">.5<span class="pl-k">%</span></span>;
+}
+<span class="pl-ent">form</span> <span class="pl-ent">button</span> {
+  <span class="pl-c1"><span class="pl-c1">width</span></span>: <span class="pl-c1">9<span class="pl-k">%</span></span>;
+  <span class="pl-c1"><span class="pl-c1">background</span></span>: <span class="pl-c1">rgb</span>(<span class="pl-c1">130, 224, 255</span>);
+  <span class="pl-c1"><span class="pl-c1">border</span></span>: <span class="pl-c1">none</span>;
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">10<span class="pl-k">px</span></span>;
+}
+<span class="pl-e">.messages</span> {
+  <span class="pl-c1"><span class="pl-c1">list-style-type</span></span>: <span class="pl-c1">none</span>;
+  <span class="pl-c1"><span class="pl-c1">margin</span></span>: <span class="pl-c1">0</span>;
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">0</span>;
+}
+<span class="pl-e">.messages</span> <span class="pl-ent">li</span> {
+  <span class="pl-c1"><span class="pl-c1">padding</span></span>: <span class="pl-c1">5<span class="pl-k">px</span></span> <span class="pl-c1">10<span class="pl-k">px</span></span>;
+}
+<span class="pl-e">.messages</span> <span class="pl-ent">li</span><span class="pl-e">:nth-child</span>(<span class="pl-c1">odd</span>) {
+  <span class="pl-c1"><span class="pl-c1">background</span></span>: <span class="pl-c1">#eee</span>;
+}</pre></div>
+
+<p>Now that we set up our index.html file and stylesheet, it's time to config socket.io. First, we need to install and save socket.io to our package.json file. </p>
+
+<pre><code>$ npm install socket.io --save 
+</code></pre>
+
+<p>In our main application index.js, we need to require socket.io. In this example we are attaching socket.io to an HTTP server listening on port 4000. </p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> io <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">"</span>socket.io<span class="pl-pds">"</span></span>)(http);
+
+<span class="pl-smi">io</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">"</span>connection<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">socket</span>){
+  <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">"</span>Socket.io has been connected!<span class="pl-pds">"</span></span>);
+});
+</pre></div>
+
+<p>And in our index.html file we need to add both jQuery and socket.io script tags:</p>
+
+<div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>/socket.io/socket.io.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>http://code.jquery.com/jquery-1.11.1.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;
+&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s"><span class="pl-pds">"</span>js/script.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+
+<p>Finally, in our script.js, we need to declare a socket variable to call socket.io:</p>
+
+<div class="highlight highlight-source-js"><pre>
+<span class="pl-en">$</span>(<span class="pl-c1">document</span>).<span class="pl-en">ready</span>(<span class="pl-k">function</span>(){
+  <span class="pl-k">var</span> socket <span class="pl-k">=</span> <span class="pl-en">io</span>(); 
+});</pre></div>
+
+<p>Restart your server, and you should see that socket.io has been connected. Now let's actually grab the content of the message input and have append it to the DOM when a user click's send. Add this to our script.js file after we have declared socket as a variable.</p>
+
+<div class="highlight highlight-source-js"><pre>
+<span class="pl-en">$</span>(<span class="pl-s"><span class="pl-pds">"</span>button<span class="pl-pds">"</span></span>).<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">"</span>click<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(){
+    <span class="pl-smi">socket</span>.<span class="pl-en">emit</span>(<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>, <span class="pl-en">$</span>(<span class="pl-s"><span class="pl-pds">"</span>#msg<span class="pl-pds">"</span></span>).<span class="pl-en">val</span>());
+    <span class="pl-en">$</span>(<span class="pl-s"><span class="pl-pds">"</span>#msg<span class="pl-pds">"</span></span>).<span class="pl-en">val</span>(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>);
+    <span class="pl-k">return</span> <span class="pl-c1">false</span>;
+  });
+
+  <span class="pl-smi">socket</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">msg</span>){
+    <span class="pl-en">$</span>(<span class="pl-s"><span class="pl-pds">"</span>.messages<span class="pl-pds">"</span></span>).<span class="pl-en">append</span>(<span class="pl-en">$</span>(<span class="pl-s"><span class="pl-pds">"</span>&lt;li&gt;&lt;/li&gt;<span class="pl-pds">"</span></span>).<span class="pl-c1">text</span>(msg));
+  });</pre></div>
+
+<p>Now we have all the code written on the client side, let's update our back end to recieve the message. </p>
+
+<div class="highlight highlight-source-js"><pre>
+<span class="pl-smi">io</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">"</span>connection<span class="pl-pds">"</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">socket</span>){
+  <span class="pl-smi">socket</span>.<span class="pl-en">on</span>(<span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">msg</span>){
+    <span class="pl-smi">io</span>.<span class="pl-en">emit</span>(<span class="pl-s"><span class="pl-pds">"</span>message<span class="pl-pds">"</span></span>, msg)
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-s"><span class="pl-pds">'</span>message:<span class="pl-pds">'</span></span> <span class="pl-k">+</span> msg);
+  });
+});</pre></div>
+
+<p>With socket.io, .emit method is available which emits an event to the socket identified by the string name to all connected clients. Both of the following synatax would work correctly in our example: </p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-smi">io</span>.<span class="pl-smi">sockets</span>.<span class="pl-en">emit</span>();
+<span class="pl-smi">io</span>.<span class="pl-en">emit</span>();</pre></div>
+
+<p>Also, we are sending "message" consistently on the client and server, but please note you could name this anything including "pizza" and as long as it's consistent, it will work the same. Socket.io allows you to do this and create custom events. </p>
+
+<p>Finally, at localhost://4000, you sould be able to send messages that appear on your application's webpage. Socket.io's documentation examples additional methods available to continue building your chat messaging application. <a href="https://github.com/socketio/socket.io">https://github.com/socketio/socket.io</a></p>
+
+<p>In Summary, we have a lot of resources available as developers to send data over the web, asynchronously. Front-End Frameworks like Angular help us to more easily make Ajax requests and communicate between client and server. However, as we continue to build more applications that rely on real-time data, it appears WebSockets could be a useful resource in helping us accomplish our domain. </p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Web Sockets maintained by <a href="https://github.com/beckybeauchamp1">beckybeauchamp1</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
